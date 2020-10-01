@@ -1,0 +1,47 @@
+.profile{
+  border-bottom:2px solid #aaa;
+}
+
+.profileRow{
+  background-color:#ddd;
+}
+
+.profileAccordion{
+  background-color:#ddd;
+}
+
+.imgContainer{
+  position:relative;
+  height:80px;
+  width:80px;
+  overflow:hidden;
+  border-radius:50%
+}
+
+.imgContainer img{
+  height: 80px;
+  position:absolute; 
+  left:50%;
+  transform:translateX(-50%)
+}
+
+.location {
+  font-size:12px;
+  font-weight:900;
+  letter-spacing: 0.05rem;
+}
+
+.fullName{
+  font-size: 20px;
+  font-weight: 500!important ;
+}
+
+.jobTitle{
+  color: #666;
+  font-size: 16px;
+  font-weight: 500!important
+}
+
+.showMoreLg{
+  vertical-align: middle;
+}
