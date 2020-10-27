@@ -1,4 +1,10 @@
-.footer{
+:root {
+  --myLightGrey: #f2f2f2;
+  --myDarkGrey: #666666;
+  --myBlue: #1b8fe2;
+}
+
+.footer {
   box-sizing: border-box;
-  min-height:10vh;
+  min-height: 10vh;
 }

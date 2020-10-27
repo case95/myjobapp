@@ -1,16 +1,33 @@
+//Modules required for routing.
 const express = require("express");
 const router = express.Router();
 
-const testController = require("../controllers/testController");
-const userController = require("../controllers/userController");
+//Controllers
+const CategoriesController = require("../controllers/CategoriesController");
+const UsersController = require("../controllers/UsersController");
 const AuthenticationController = require("../controllers/AuthenticationController");
 
+//Policies
+const AuthControllerPolicy = require("../policies/AuthControllerPolicy");
+
 //Routes
-router.get("/test", testController.getTest);
-router.post("/test", testController.postTest);
 
-router.get("/workers", userController.getWorkers);
+router.post(
+  "/register",
+  AuthControllerPolicy.register,
+  AuthenticationController.register
+);
 
-router.post("/register", AuthenticationController.register);
+router.post("/login",  AuthenticationController.login);
+router.get('/auth', AuthenticationController.authCheck, AuthenticationController.authCheckAfter)
+
+/* Need to save JWT in HTML only cookie*/
+
+router.get("/browse", CategoriesController.getCategories);
+
+/*router.get("/browse", UserController.getUsers);*/
+/*router.get("/browse/:userId", UserController.getUsersById);*/
+
+router.get("/yourprofile/:userId", UsersController.getUserData);
 
 module.exports = router;

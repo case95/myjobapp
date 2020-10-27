@@ -1,4 +1,15 @@
-.navbar{
+:root {
+  --myLightGrey: #f2f2f2;
+  --myDarkGrey: #666666;
+  --myBlue: #1b8fe2;
+}
+
+.navbar {
   box-sizing: border-box;
-  min-height:15vh;
+  min-height: 15vh;
+}
+
+.navbar-brand {
+  font-family: "Righteous", cursive;
+  font-size: 36px !important;
 }

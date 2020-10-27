@@ -1,0 +1,43 @@
+:root {
+  --myLightGrey: #f2f2f2;
+  --myDarkGrey: #666666;
+  --myBlue: #1b8fe2;
+}
+
+.signInContainer {
+  padding: 30px 0;
+  min-height: 75vh;
+}
+.noPositionAbsolute {
+  position: static;
+  transform: unset;
+  transition: transform 0s, background-color 0.3s ease-in-out;
+  width: 40%;
+  min-width: 450px;
+  margin: 0 auto;
+}
+
+/*@media (min-width: 768px) {
+  .signInContainer {
+    height: 75vh;
+    position: relative;
+  }
+  .noPositionAbsolute {
+    position: absolute;
+    transform: translateX(-50%) translateY(-50%);
+    transition: transform 0s, background-color 0.3s ease-in-out;
+  }
+}*/
+
+.disclaimer {
+  font-size: 11px;
+  font-weight: light;
+}
+
+.disclaimerLink {
+  color: var(--myBlue);
+}
+
+.link:hover {
+  text-decoration: none;
+}

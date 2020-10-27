@@ -11,7 +11,6 @@ const data={
     "Other"
   ],
   
-  category: null,
   
   workers: [
     {

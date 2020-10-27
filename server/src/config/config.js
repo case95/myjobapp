@@ -14,6 +14,7 @@ module.exports = {
   },
   authentication: {
     //Application secret for creating a secure web token
+    //the secret is hardcoded for development purposes but will be deleted before deploying the app on the internet.
     jwtSecret: process.env.JWT_SECRET || "secret",
   },
 };

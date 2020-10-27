@@ -1,0 +1,24 @@
+:root {
+  --myLightGrey: #f2f2f2;
+  --myDarkGrey: #666666;
+  --myBlue: #1b8fe2;
+}
+
+.my-background {
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .my-background {
+    padding: 0 30px;
+  }
+}
+
+.my-searchbar {
+  padding: 0;
+  margin: 0;
+}
+
+.my-searchbar .col {
+  padding: 0;
+}
