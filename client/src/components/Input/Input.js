@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
-import InputGroup from "react-bootstrap/InputGroup";
-import Form from "react-bootstrap/Form";
-import "./Input.css";
+import React from 'react'
+import PropTypes from 'prop-types'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Form from 'react-bootstrap/Form'
+import './Input.css'
 
 const input = ({
   child,
@@ -24,7 +24,7 @@ const input = ({
 }) => {
   return (
     <div>
-      <InputGroup className={spacer && "mb-3"} >
+      <InputGroup className={spacer && 'mb-3'}>
         {/*if append = true className will have a myButtonAppend */}
         {/*if prepend = true className will have a myButtonPrepend */}
         {label && <Form.Label className={labelClassName}>{label}</Form.Label>}
@@ -38,18 +38,17 @@ const input = ({
           name={name}
           required={required}
           type={type}
-          as = {select ? "select" : "input"}
-          {...otherProps}>
-          
-            {select && options}
-          
-          </Form.Control>
-        
+          as={select ? 'select' : 'input'}
+          {...otherProps}
+        >
+          {select && options}
+        </Form.Control>
+
         {!select && child}
       </InputGroup>
     </div>
-  );
-};
+  )
+}
 
 input.propTypes = {
   label: PropTypes.string,
@@ -62,13 +61,13 @@ input.propTypes = {
   spacer: PropTypes.bool,
   append: PropTypes.bool,
   prepend: PropTypes.bool,
-};
+}
 
 input.defaultProps = {
   maxLength: 30,
   spacer: true,
   prepend: false,
   append: false,
-};
+}
 
-export default input;
+export default input

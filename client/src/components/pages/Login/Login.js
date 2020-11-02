@@ -1,78 +1,74 @@
-import React from "react";
-import { useState } from "react";
+import React from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 
-import { Row, Col, Form } from "react-bootstrap";
+import { Row, Col, Form } from 'react-bootstrap'
 
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link } from 'react-router-dom'
 
 //Redux hook
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux'
 
 //Importing our actions.
 //This helps us organizing our redux store and avoids making typos.
-import { SET_TOKEN, SET_USER, SIGN_IN_OUT } from "../../../store/actions";
+import { SET_TOKEN, SET_USER } from '../../../store/actions'
 
-import Input from "../../Input/Input";
-import Button from "../../Button/Button";
-import Container from "../../Container/Container";
+import Input from '../../Input/Input'
+import Button from '../../Button/Button'
+import Container from '../../Container/Container'
 
-import AuthenticationServices from "../../../services/AuthenticationServices";
+import AuthenticationServices from '../../../services/AuthenticationServices'
 
 //Util to save on session storage
-import sessionStorage from "../../../store/sessionStorage"
+import sessionStorage from '../../../store/sessionStorage'
 
-import "./Login.css";
+import './Login.css'
 
 const LogIn = () => {
   //const token = useSelector((state) => state.token);
   //const user = useSelector((state) => state.user);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-  const [loginData, setLoginData] = useState({email:'', password:''});
+  const [loginData, setLoginData] = useState({ email: '', password: '' })
 
-  const { email, password, error } = loginData;
+  const { email, password, error } = loginData
 
-  const history = useHistory();
+  const history = useHistory()
 
   const redirect = () => {
-    history.push("/");
-  };
+    history.push('/')
+  }
 
   const onChange = (e) => {
     setLoginData({
       ...loginData,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   const onSubmit = async () => {
     try {
       const response = await AuthenticationServices.login({
         email: email,
         password: password,
-      });
-      const {user, token} = response.data
-      
+      })
+      const { user, token } = response.data
+
       sessionStorage.set('jwt', token)
-      
-      dispatch({ type: SET_USER, payload: user.id });
-      dispatch({ type: SET_TOKEN, payload: token });
-      dispatch({ type: SIGN_IN_OUT });
-      
-      axios.defaults.headers.common["Authorization"] = token
-      const authResponse = await AuthenticationServices.getAuth()
-      
-      redirect();
+
+      dispatch({ type: SET_USER, payload: user.id })
+      dispatch({ type: SET_TOKEN, payload: token })
+
+      redirect()
     } catch (err) {
-      console.log(err);
+      console.log(err)
       setLoginData({
         ...loginData,
         error: err.response.data.error,
-      });
+      })
     }
-  };
+  }
   return (
     <div className="logInContainer d-flex">
       <Container
@@ -91,8 +87,8 @@ const LogIn = () => {
         child={
           <Form
             onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(e);
+              e.preventDefault()
+              onSubmit(e)
             }}
           >
             <Row className="m-0">
@@ -134,12 +130,12 @@ const LogIn = () => {
                 className="checkbox"
               />
             </Form.Group>
-            <Button type={"submit"}>Join</Button>
+            <Button type={'submit'}>Join</Button>
           </Form>
         }
       ></Container>
     </div>
-  );
-};
+  )
+}
 
-export default LogIn;
+export default LogIn

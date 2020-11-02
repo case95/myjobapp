@@ -1,4 +1,4 @@
-import Api from "./Api";
+import Api from './Api'
 
 export default {
   getUserData(userId) {
@@ -8,6 +8,6 @@ export default {
     return Api().get(`/browse`, { params: { search: search } })
   },
   updateUserData(userData) {
-    return Api.put(``)
-  }
-};
+    return Api().put(`/yourprofile/${userData.id}`, userData)
+  },
+}

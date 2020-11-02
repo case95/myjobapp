@@ -9,88 +9,100 @@
   min-height: 75vh;
 }
 
-.YourProfileTab{
+.YourProfileTab {
   position: relative;
-  margin-top:75px;
+  margin-top: 75px;
   padding-top: 105px;
   background-color: var(--myLightGrey);
   overflow: auto;
 }
 
-.YourProfileTab:hover{
-  background-color: var(--myLightGrey)
+.YourProfileTab:hover {
+  background-color: var(--myLightGrey);
 }
 
-.YourProfileImg{
-  position:absolute;
-  top:0;
-  left:50%;
+.YourProfileImgContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  width:150px;
-  height:150px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background-color: white;
-  z-index:1;
+  z-index: 1;
 }
 
-.YourProfileImgShadow{
-  position:absolute;
-  top:0;
-  left:50%;
+.YourProfileImgShadow {
+  position: absolute;
+  top: 0;
+  left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  width:150px;
-  height:150px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background-color: white;
-  content:"";
-  z-index:-1;
+  content: '';
+  z-index: -1;
   box-shadow: -2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
-.YourProfileImg::after{
-  position:absolute;
-  top:10px;
-  left:50%;
+.YourProfileImg {
+  position: absolute;
+  overflow: hidden;
+  top: 10px;
+  left: 50%;
   transform: translateX(-50%);
-  width:130px;
-  height:130px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  background-color: yellow;
-  content:"";
-  z-index:3;
 }
 
-#BrowseImg{
-  display:none;
+#imagePreview {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  object-position: center;
 }
-.CustomBrowseImgButton{
-  position:absolute;
-  bottom:10px;
-  right:10px;
-  margin-bottom:0;
-  width:30px;
-  height:30px;
+
+#BrowseImg {
+  display: none;
+}
+.CustomBrowseImgButton {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  margin-bottom: 0;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: var(--myBlue);
-  z-index:4;
+  z-index: 4;
 }
 
-.YourProfileForm .YourProfileInputLabel{
+.YourProfileForm .YourProfileInputLabel {
   text-transform: capitalize;
-  width:100px;
+  width: 100px;
 }
 
-.fa-plus{
-  position:absolute;
-  left:50%;
-  top:50%;
+.radioLabel {
+  display: inline-block;
+}
+
+.inputBox {
+  height: 35px;
+}
+
+.fa-plus {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   transform: translateX(-50%) translateY(-50%);
   color: white;
   font-size: 20px;
 }
 .my-background {
   padding: 0;
-  
 }
 
 @media (min-width: 768px) {

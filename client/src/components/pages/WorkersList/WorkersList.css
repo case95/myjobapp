@@ -19,6 +19,14 @@
   margin: 0;
 }
 
+.my-searchbar-container {
+  position: sticky !important;
+  background-color: white;
+  box-shadow: 0 5px 0 5px white;
+  top: 0;
+  z-index: 999;
+}
+
 .my-searchbar .col {
   padding: 0;
 }

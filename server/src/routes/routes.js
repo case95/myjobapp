@@ -1,33 +1,38 @@
 //Modules required for routing.
-const express = require("express");
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 
 //Controllers
-const CategoriesController = require("../controllers/CategoriesController");
-const UsersController = require("../controllers/UsersController");
-const AuthenticationController = require("../controllers/AuthenticationController");
+const CategoriesController = require('../controllers/CategoriesController')
+const UsersController = require('../controllers/UsersController')
+const AuthenticationController = require('../controllers/AuthenticationController')
 
 //Policies
-const AuthControllerPolicy = require("../policies/AuthControllerPolicy");
+const AuthControllerPolicy = require('../policies/AuthControllerPolicy')
 
 //Routes
 
 router.post(
-  "/register",
+  '/register',
   AuthControllerPolicy.register,
   AuthenticationController.register
-);
+)
 
-router.post("/login",  AuthenticationController.login);
-router.get('/auth', AuthenticationController.authCheck, AuthenticationController.authCheckAfter)
+router.post('/login', AuthenticationController.login)
+router.get(
+  '/auth',
+  AuthenticationController.authCheck,
+  AuthenticationController.authCheckAfter
+)
 
 /* Need to save JWT in HTML only cookie*/
 
-router.get("/browse", CategoriesController.getCategories);
+router.get('/browse', CategoriesController.getCategories)
 
 /*router.get("/browse", UserController.getUsers);*/
 /*router.get("/browse/:userId", UserController.getUsersById);*/
 
-router.get("/yourprofile/:userId", UsersController.getUserData);
+router.get('/yourprofile/:userId', UsersController.getUserData)
+router.put('/yourprofile/:userId', UsersController.updateUserData)
 
-module.exports = router;
+module.exports = router

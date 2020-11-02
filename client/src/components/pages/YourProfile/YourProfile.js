@@ -1,185 +1,267 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from 'react'
 
-import { useHistory} from "react-router-dom";
+import { useHistory } from 'react-router-dom'
 
-import { Form, Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from 'react-bootstrap'
 
-import Container from "../../Container/Container";
+import Container from '../../Container/Container'
 import Input from '../../Input/Input'
 import Button from '../../Button/Button'
 
 //Redux
-import {useSelector} from 'react-redux'
+import { useSelector } from 'react-redux'
 
 //Services
-import UsersServices from "../../../services/UsersServices"
-import CategoriesServices from "../../../services/CategoriesServices"
+import UsersServices from '../../../services/UsersServices'
+import CategoriesServices from '../../../services/CategoriesServices'
 
 import './YourProfile.css'
 
 const YourProfile = () => {
-  
   const [userData, setUserData] = useState()
-  
+
   const [categories, setCategories] = useState([])
-  
+
   const [error, setError] = useState('')
-  
-  const userId = useSelector((state) => state.user);
-  
-  useEffect( ()=>{
-    
+
+  const userId = useSelector((state) => state.user)
+
+  useEffect(() => {
     const fetchCategories = async () => {
-      const a = await getCategories();
-      setCategories(a);
-    };
- 
-    fetchCategories();
-    
+      const a = await getCategories()
+      setCategories(a)
+    }
+
+    fetchCategories()
+
     const fetchData = async () => {
-      
-      
-      
-      const a = await getUserData(userId);
-      const cleanUserData = Object.entries(a).reduce(  (accumulator, [key, value]) => {
-        if (key === 'firstName'){
-          return {...accumulator, 'first name' : (value === null || value === undefined ? '' : value)}
-        }
-        if (key === 'lastName'){
-          return {...accumulator, 'last name' : (value === null || value === undefined ? '' : value)}
-        }
-        
-        return {...accumulator, [key] : (value === null || value === undefined ? '' : value)}
-      }, {}
+      const a = await getUserData(userId)
+      const cleanUserData = Object.entries(a).reduce(
+        (accumulator, [key, value]) => {
+          return {
+            ...accumulator,
+            [key]: value === null || value === undefined ? '' : value,
+          }
+        },
+        {}
       )
       setUserData(cleanUserData)
     }
-    fetchData();
-  },[])
-  
+    fetchData()
+  }, [])
+
   const getUserData = async (payload) => {
     try {
       const response = await UsersServices.getUserData(payload)
       console.log(response.data)
       return response.data
-    }
-    catch(err){
+    } catch (err) {
       setError(err)
     }
   }
-  
+
   const getCategories = async () => {
     try {
       const response = await CategoriesServices.getCategories()
       return response.data
-    }
-    catch(err){
+    } catch (err) {
       console.log(err)
     }
   }
-  
+
   const onChange = (e) => {
-    e.persist();
-    
-    setUserData ({
-      ...userData,
-      [e.target.name]:e.target.value
-    })
+    e.persist()
+    if (e.target.name !== 'image') {
+      setUserData({
+        ...userData,
+        [e.target.name]: e.target.value,
+      })
+    } else {
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setUserData({
+            ...userData,
+            [e.target.name]: reader.result,
+          })
+        }
+      }
+      reader.readAsDataURL(e.target.files[0])
+    }
   }
-  
-  const history = useHistory();
+
+  const history = useHistory()
 
   const redirect = () => {
-    history.push("/");
-  };
-  
+    history.push('/')
+  }
+
   const onSubmit = async () => {
     try {
-        await UsersServices.updateUserData(userData);
-        redirect();
+      await UsersServices.updateUserData(userData)
+      redirect()
     } catch (err) {
-      console.log(err);
-      setError( err.response.data.error);
+      console.log(err.response)
+      setError(err.response.data.error)
     }
-  };
-  
-  return(
+  }
+
+  return (
     <div className="YourProfileContainer d-flex">
       <Container
         className="YourProfileTab"
         styleNumber={0}
-        title={`Don't miss it, be part of our community!`}
+        title={`Keep your informations updated!`}
         child={
           <div>
             <div className="YourProfileImgShadow"> </div>
-            <div className="YourProfileImg"> 
-              <label className="CustomBrowseImgButton">
+            <div className="YourProfileImgContainer">
+              <div className="YourProfileImg">
+                <img
+                  id="imagePreview"
+                  src={
+                    userData &&
+                    (userData.image !== '' ||
+                      userData.image !== null ||
+                      userData.image !== undefined)
+                      ? userData.image
+                      : 'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'
+                  }
+                />
+              </div>
+              <label htmlFor="BrowseImg" className="CustomBrowseImgButton">
                 <i className="fa fa-plus"></i>
-                <input type="file" id="BrowseImg" name="myfile"/>
+                <input
+                  type="file"
+                  name="image"
+                  id="BrowseImg"
+                  accept="image/*"
+                  onChange={(e) => onChange(e)}
+                  required={true}
+                  key={
+                    userData &&
+                    Object.entries(userData).map(([key, value], index) => {
+                      if (key === 'image') {
+                        return index
+                      } else {
+                        return
+                      }
+                    })
+                  }
+                />
               </label>
             </div>
+
             <Form
-            className="YourProfileForm"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(e);
-            }}>
-              {userData && categories && Object.entries(userData).map(([key, value], index) =>{ 
-              
-              if (key==='category'){ return <Input
-                className="mb-3"
-                placeholder="Category"
-                type="string"
-                value ={value = null||undefined ? '' : value}
-                name={key}
-                idNumber={index}
-                required={true}
-                onChange={(e) =>onChange(e)}
-                labelClassName={'YourProfileInputLabel'}
-                label={key}
-                key={index}
-                select={true}
-                options={
-                  Array.isArray(categories) ? categories.map(category => {
-                    return(<option key={category.id}>
-                        {category.category}
-                      </option>)}) : <option /*key={category.id}*/>Loading</option>
+              className="YourProfileForm"
+              onSubmit={(e) => {
+                e.preventDefault()
+                onSubmit(e)
+              }}
+            >
+              {userData &&
+                categories &&
+                Object.entries(userData).map(([key, value], index) => {
+                  if (key === 'id') {
+                    return
                   }
-              ></Input>
-              }
-              
-              return <Input
-                className="YourProfileInput"
-                placeholder={`${value}`}
-                type="string"
-                value={value = null||undefined ? 'ole' : value}
-                name={key}
-                idNumber={index}
-                onChange={(e) => onChange(e)}
-                required={true}
-                maxLength={25}
-                labelClassName={'YourProfileInputLabel'}
-                label={key}
-                key={index}
-                ></Input>
-              }
-            
-              )}
+                  if (key === 'availability') {
+                    return (
+                      <div key={index} className=" inputBox mb-3">
+                        <p className="YourProfileInputLabel radioLabel m-0">
+                          {key}
+                        </p>
+                        <Form.Check
+                          inline
+                          label="Available"
+                          type="radio"
+                          id={`inline-${index}-1`}
+                        />
+                        <Form.Check
+                          inline
+                          label="Unavailable"
+                          type="radio"
+                          id={`inline-${index}-2`}
+                        />
+                      </div>
+                    )
+                  }
+                  if (key === 'category') {
+                    return (
+                      <Input
+                        placeholder="Category"
+                        type="string"
+                        value={key /*HOW DO I GET DATA FROM OPTIONS?*/}
+                        name={key}
+                        idNumber={index}
+                        required={true}
+                        onChange={(e) => onChange(e)}
+                        labelClassName={'YourProfileInputLabel'}
+                        label={key}
+                        key={index}
+                        select={true}
+                        options={
+                          Array.isArray(categories) ? (
+                            categories.map((category) => {
+                              return (
+                                <option key={category.id}>
+                                  {category.category}
+                                </option>
+                              )
+                            })
+                          ) : (
+                            <option /*key={category.id}*/>Loading</option>
+                          )
+                        }
+                      ></Input>
+                    )
+                  } else {
+                    var label = key
+
+                    if (key === 'firstName') {
+                      label = 'First Name'
+                    }
+                    if (key === 'lastName') {
+                      label = 'Last Name'
+                    }
+
+                    if (key === 'image') {
+                      return
+                    }
+
+                    return (
+                      <Input
+                        className="YourProfileInput"
+                        placeholder={`${value}`}
+                        type="string"
+                        value={value}
+                        name={key}
+                        idNumber={index}
+                        onChange={(e) => onChange(e)}
+                        required={true}
+                        maxLength={25}
+                        labelClassName={'YourProfileInputLabel'}
+                        label={label}
+                        key={index}
+                      ></Input>
+                    )
+                  }
+                })}
               {error && <div className="text-danger mb-3">{error}</div>}
               <Button
-              onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(e);
-              }}>
-              Submit
-            </Button>
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  onSubmit(e)
+                }}
+              >
+                Submit
+              </Button>
             </Form>
           </div>
         }
       ></Container>
     </div>
   )
-  
 }
 
 export default YourProfile

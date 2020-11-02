@@ -1,13 +1,13 @@
-import React, { useState, useEffect} from "react";
-import { Form, InputGroup, Row, Col} from "react-bootstrap";
+import React, { useState, useEffect } from 'react'
+import { Form, InputGroup, Row, Col } from 'react-bootstrap'
 
-import WorkerProfile from "../../WorkerProfile/WorkerProfile";
+import WorkerProfile from '../../WorkerProfile/WorkerProfile'
 import Input from '../../Input/Input'
 import Button from '../../Button/Button'
 
 //Services
-import usersServices from "../../../services/UsersServices"
-import CategoriesServices from "../../../services/CategoriesServices"
+import usersServices from '../../../services/UsersServices'
+import CategoriesServices from '../../../services/CategoriesServices'
 
 import './WorkersList.css'
 
@@ -15,61 +15,53 @@ import './WorkersList.css'
 import data from '../../../models/models'
 
 const WorkersList = () => {
-  
-  
-  useEffect( ()=>{
-    
+  useEffect(() => {
     const fetchData = async () => {
-      const a = await getCategories();
-      setCategories(a);
-    };
- 
-    fetchData();
-    
-  },[])
-  
+      const a = await getCategories()
+      setCategories(a)
+    }
+
+    fetchData()
+  }, [])
+
   const [categories, setCategories] = useState([])
-  
+
   const [showCategory, setCategory] = useState()
-  
-  const [searchPayload, setSearchPayload] = useState({category:'', position:'', location:''})
-  
-  const {category, position, location} = searchPayload
-  
+
+  const [searchPayload, setSearchPayload] = useState({
+    category: '',
+    position: '',
+    location: '',
+  })
+
+  const { category, position, location } = searchPayload
+
   const [error, setError] = useState()
-  
-  
+
   const onSubmit = async () => {
     try {
       const response = await usersServices.getUsers(searchPayload)
       console.log(response)
-    }
-    catch(err){
+    } catch (err) {
       setError(err)
     }
   }
-  
-  
-  
-  const onChange = async ( e ) => {
-    await(
-    setSearchPayload({
+
+  const onChange = async (e) => {
+    await setSearchPayload({
       ...searchPayload,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
-    )
   }
-  
-  
-  
+
   const filterUsers = (list) => {
     const filteredList = list.filter(
       (worker) => worker.category === showCategory
-    );
+    )
 
     return filteredList.map((worker) => (
       <WorkerProfile
-        location={worker.address.city}
+        img={worker.address.city}
         name={worker.firstName}
         lastName={worker.lastName}
         jobTitle={worker.jobTitle}
@@ -78,36 +70,28 @@ const WorkersList = () => {
         skills={worker.skills}
         key={worker.id}
       ></WorkerProfile>
-    ));
-  };
-  
-  
-  
-  
+    ))
+  }
+
   const getCategories = async () => {
     try {
       const response = await CategoriesServices.getCategories()
       return response.data
-    }
-    catch(err){
+    } catch (err) {
       console.log(err)
     }
   }
-  
-  
-  
-  
+
   return (
-    <div className='my-background'>
-        
-      <Row className="mx-0 d-block d-sm-none">
+    <div className="my-background">
+      <Row className="mx-0 d-block d-sm-none my-searchbar-container">
         <Form
           className="mx-auto"
           onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit(e);
+            e.preventDefault()
+            onSubmit(e)
           }}
-          >
+        >
           <Row className="my-searchbar mx-0">
             <Col className="p-3">
               <Input
@@ -118,17 +102,22 @@ const WorkersList = () => {
                 idNumber={0}
                 required={true}
                 spacer={false}
-                onChange={(e) =>{ setCategory(e.target.value); onChange(e)}}
+                onChange={(e) => {
+                  setCategory(e.target.value)
+                  onChange(e)
+                }}
                 select={true}
                 options={
-                  Array.isArray(categories) ? categories.map((category) => {
-                    return(
-                      <option key={category.id}>
-                        {category.category}
-                      </option>
+                  Array.isArray(categories) ? (
+                    categories.map((category) => {
+                      return (
+                        <option key={category.id}>{category.category}</option>
                       )
-                    }) : <option key={category.id}>Loading</option>
-                  }
+                    })
+                  ) : (
+                    <option key={category.id}>Loading</option>
+                  )
+                }
               ></Input>
               <Input
                 className="mb-3"
@@ -151,123 +140,127 @@ const WorkersList = () => {
                 onChange={(e) => onChange(e)}
               ></Input>
               <Button
-                type={"submit"}
-                style={{ height: "100%" }}
+                type={'submit'}
+                style={{ height: '100%' }}
                 child={
-                  <p className='m-0'>Search <i className="fa fa-search" aria-hidden="true"></i></p>
+                  <p className="m-0">
+                    Search <i className="fa fa-search" aria-hidden="true"></i>
+                  </p>
                 }
               ></Button>
-            {error && <div className="text-danger mb-3">{error}</div>}
+              {error && <div className="text-danger mb-3">{error}</div>}
             </Col>
           </Row>
         </Form>
       </Row>
-        
-        <Row className="mx-3 py-3 d-none d-sm-block">
-          <Form
-              className="mx-auto"
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit(e);
-              }}
-            >
-              <Row className="my-searchbar mx-0">
-                <Col>
-                  <Input
-                    placeholder="Category"
-                    value={category}
-                    name="category"
-                    idNumber={0}
-                    required={true}
-                    spacer={false}
-                    onChange={(e) =>{ setCategory(e.target.value); onChange(e)}}
-                    prepend={true}
-                    select={true}
-                    options={
-                      Array.isArray(categories) ? categories.map((category) => {
-                        return(
-                          <option key={category.id}>
-                            {category.category}
-                          </option>
-                          )
-                        }) : <option key={category.id}>Loading</option>
-                      
-                    }
-                  ></Input>
-                
-                </Col>
-                
-                <Col>
-                  <Input
-                    placeholder="Position"
-                    type="string"
-                    value={position}
-                    name="position"
-                    idNumber={0}
-                    required={true}
-                    spacer={false}
-                    onChange={(e) => onChange(e)}
-                    prepend={true}
-                    append={true}
-                  ></Input>
-                </Col>
-                
-                <Col>
-                  <Input
-                    placeholder="Location"
-                    type="string"
-                    value={location}
-                    name="location"
-                    idNumber={0}
-                    required={true}
-                    spacer={false}
-                    onChange={(e) => onChange(e)}
-                    prepend={true}
-                    append={true}
-                    child={
-                      <div>
-                        <InputGroup.Append>
-                          <Button
-                            type={"submit"}
-                            append={true}
-                            style={{ height: "100%" }}
-                            child={
-                              <i className="fa fa-search" aria-hidden="true"></i>
-                            }
-                          ></Button>
-                        </InputGroup.Append>
-                      </div>
-                    }
-                  ></Input>
-                </Col>
-              </Row>
-            </Form>
-          </Row>
-            
-          <div
-            className="container-fluid p-3"
-          >
-            <div className="row">
-              <div className="col">
-                <p className="h2 text-primary">{showCategory}</p>
-              </div>
-            </div>
 
-            <div id=" contactList">{showCategory ? 
-              filterUsers(data.workers) : 
-              <Row><h1 className="mx-auto">Search workers :)</h1></Row>}
-              {error && <div className="text-danger mb-3">{error}</div>}
-            </div>
+      <Row className="mx-3 py-3 d-none d-sm-block my-searchbar-container">
+        <Form
+          className="mx-auto"
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(e)
+          }}
+        >
+          <Row className="my-searchbar mx-0">
+            <Col>
+              <Input
+                placeholder="Category"
+                value={category}
+                name="category"
+                idNumber={0}
+                required={true}
+                spacer={false}
+                onChange={(e) => {
+                  setCategory(e.target.value)
+                  onChange(e)
+                }}
+                prepend={true}
+                select={true}
+                options={
+                  Array.isArray(categories) ? (
+                    categories.map((category) => {
+                      return (
+                        <option key={category.id}>{category.category}</option>
+                      )
+                    })
+                  ) : (
+                    <option key={category.id}>Loading</option>
+                  )
+                }
+              ></Input>
+            </Col>
+
+            <Col>
+              <Input
+                placeholder="Position"
+                type="string"
+                value={position}
+                name="position"
+                idNumber={0}
+                required={true}
+                spacer={false}
+                onChange={(e) => onChange(e)}
+                prepend={true}
+                append={true}
+              ></Input>
+            </Col>
+
+            <Col>
+              <Input
+                placeholder="Location"
+                type="string"
+                value={location}
+                name="location"
+                idNumber={0}
+                required={true}
+                spacer={false}
+                onChange={(e) => onChange(e)}
+                prepend={true}
+                append={true}
+                child={
+                  <div>
+                    <InputGroup.Append>
+                      <Button
+                        type={'submit'}
+                        append={true}
+                        style={{ height: '100%' }}
+                        child={
+                          <i className="fa fa-search" aria-hidden="true"></i>
+                        }
+                      ></Button>
+                    </InputGroup.Append>
+                  </div>
+                }
+              ></Input>
+            </Col>
+          </Row>
+        </Form>
+      </Row>
+
+      <div className="container-fluid p-3">
+        <div className="row">
+          <div className="col">
+            <p className="h2 text-primary">{showCategory}</p>
           </div>
+        </div>
+
+        <div id=" contactList">
+          {showCategory ? (
+            filterUsers(data.workers)
+          ) : (
+            <Row>
+              <h1 className="mx-auto">Search workers :)</h1>
+            </Row>
+          )}
+          {error && <div className="text-danger mb-3">{error}</div>}
+        </div>
       </div>
+    </div>
   )
 }
 
 export default WorkersList
-
-
-
-
 
 /*
 
