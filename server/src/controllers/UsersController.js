@@ -1,14 +1,31 @@
 const { User } = require('../models')
-const { Op } = require('../models')
+const { Op } = require('sequelize')
 
 module.exports = {
   async getUsers(req, res) {
+    console.log(
+      'REQUEST',
+      req.query.category,
+      req.query.location,
+      req.query.position
+    )
     try {
-      User.findAll().then((users) => {
-        res.status(200).send(users)
+      const users = await User.findAll({
+        where: {
+          category: req.query.category,
+          location: { [Op.like]: `%${req.query.location}%` },
+          [Op.or]: [
+            { job: { [Op.like]: `%${req.query.position}%` } },
+            { bio: { [Op.like]: `%${req.query.position}%` } },
+            { skills: { [Op.like]: `%${req.query.position}%` } },
+          ],
+        },
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
       })
-    } catch {
-      ;(err) => console.log(err)
+      res.status(200).send(users)
+    } catch (err) {
+      console.log('ERROR', err)
+      res.status(404).send(err)
     }
   },
 
@@ -31,8 +48,6 @@ module.exports = {
       })
       res.send(user)
     } catch (err) {
-      console.log('request', req.body)
-      console.log('error', err)
       res.status(500).send({
         error: `Sorry ${req.body.firstName}, there was a problem updating your data.`,
       })

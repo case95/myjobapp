@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 
-import { useHistory } from 'react-router-dom'
-
-import { Form, Row, Col } from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 
 import Container from '../../Container/Container'
 import Input from '../../Input/Input'
 import Button from '../../Button/Button'
+
+import { useHistory } from 'react-router-dom'
 
 //Redux
 import { useSelector } from 'react-redux'
@@ -38,6 +38,15 @@ const YourProfile = () => {
       const a = await getUserData(userId)
       const cleanUserData = Object.entries(a).reduce(
         (accumulator, [key, value]) => {
+          if (key === 'skills') {
+            return {
+              ...accumulator,
+              [key]:
+                value === null || value === undefined || ''
+                  ? ['', '', '', '', '']
+                  : value.split(','),
+            }
+          }
           return {
             ...accumulator,
             [key]: value === null || value === undefined ? '' : value,
@@ -53,10 +62,10 @@ const YourProfile = () => {
   const getUserData = async (payload) => {
     try {
       const response = await UsersServices.getUserData(payload)
-      console.log(response.data)
       return response.data
     } catch (err) {
-      setError(err)
+      console.log(err)
+      setError('There was a problem retrieving your informations')
     }
   }
 
@@ -65,18 +74,13 @@ const YourProfile = () => {
       const response = await CategoriesServices.getCategories()
       return response.data
     } catch (err) {
-      console.log(err)
+      console.log('There was a problem with the server')
     }
   }
 
-  const onChange = (e) => {
+  const onChange = (e, index) => {
     e.persist()
-    if (e.target.name !== 'image') {
-      setUserData({
-        ...userData,
-        [e.target.name]: e.target.value,
-      })
-    } else {
+    if (e.target.name === 'image') {
       const reader = new FileReader()
       reader.onload = () => {
         if (reader.readyState === 2) {
@@ -87,22 +91,49 @@ const YourProfile = () => {
         }
       }
       reader.readAsDataURL(e.target.files[0])
+      return
     }
+    if (e.target.name === 'availability') {
+      setUserData({
+        ...userData,
+        [e.target.name]: !userData[e.target.name],
+      })
+      return
+    }
+    if (e.target.name === 'skill') {
+      const newArray = userData.skills
+      newArray[index] = e.target.value
+
+      setUserData({
+        ...userData,
+        skills: newArray,
+      })
+      return
+    }
+
+    setUserData({
+      ...userData,
+      [e.target.name]: e.target.value,
+    })
+    return
   }
 
-  const history = useHistory()
-
-  const redirect = () => {
-    history.push('/')
-  }
+  const redirect = useHistory()
 
   const onSubmit = async () => {
+    const skillsString = userData.skills.join()
+    const cleanUserData = {
+      ...userData,
+      skills: skillsString,
+    }
     try {
-      await UsersServices.updateUserData(userData)
-      redirect()
+      await UsersServices.updateUserData(cleanUserData)
+      redirect.push('/')
     } catch (err) {
       console.log(err.response)
-      setError(err.response.data.error)
+      setError(
+        'There was a problem updating your informations. Your image might be too heavy.'
+      )
     }
   }
 
@@ -118,6 +149,7 @@ const YourProfile = () => {
             <div className="YourProfileImgContainer">
               <div className="YourProfileImg">
                 <img
+                  alt="profile avatar"
                   id="imagePreview"
                   src={
                     userData &&
@@ -143,8 +175,6 @@ const YourProfile = () => {
                     Object.entries(userData).map(([key, value], index) => {
                       if (key === 'image') {
                         return index
-                      } else {
-                        return
                       }
                     })
                   }
@@ -162,7 +192,7 @@ const YourProfile = () => {
               {userData &&
                 categories &&
                 Object.entries(userData).map(([key, value], index) => {
-                  if (key === 'id') {
+                  if (key === 'id' || key === 'image') {
                     return
                   }
                   if (key === 'availability') {
@@ -173,15 +203,18 @@ const YourProfile = () => {
                         </p>
                         <Form.Check
                           inline
-                          label="Available"
-                          type="radio"
-                          id={`inline-${index}-1`}
-                        />
-                        <Form.Check
-                          inline
-                          label="Unavailable"
-                          type="radio"
-                          id={`inline-${index}-2`}
+                          label={
+                            userData && userData.availability
+                              ? 'Available'
+                              : 'Unavailable'
+                          }
+                          type="switch"
+                          id={`switch`}
+                          name="availability"
+                          checked={userData && userData.availability}
+                          onChange={(e) => {
+                            onChange(e)
+                          }}
                         />
                       </div>
                     )
@@ -191,14 +224,15 @@ const YourProfile = () => {
                       <Input
                         placeholder="Category"
                         type="string"
-                        value={key /*HOW DO I GET DATA FROM OPTIONS?*/}
+                        value={value}
                         name={key}
-                        idNumber={index}
                         required={true}
-                        onChange={(e) => onChange(e)}
+                        onChange={(e) => {
+                          onChange(e)
+                        }}
                         labelClassName={'YourProfileInputLabel'}
                         label={key}
-                        key={index}
+                        key={`skill${index}`}
                         select={true}
                         options={
                           Array.isArray(categories) ? (
@@ -215,6 +249,55 @@ const YourProfile = () => {
                         }
                       ></Input>
                     )
+                  }
+                  if (key === 'website') {
+                    return (
+                      <Input
+                        className="YourProfileInput"
+                        placeholder={`${value}`}
+                        type="string"
+                        value={value}
+                        name={key}
+                        idNumber={index}
+                        onChange={(e) => onChange(e)}
+                        required={false}
+                        maxLength={25}
+                        labelClassName={'YourProfileInputLabel'}
+                        label={key}
+                        key={index}
+                      ></Input>
+                    )
+                  }
+                  if (key === 'skills') {
+                    return (
+                      <div style={{ display: 'flex' }}>
+                        <p className="YourProfileInputLabel skillsLabel m-0 ">
+                          Skills
+                        </p>
+                        <div
+                          className="d-flex skillsContainer"
+                          key="skill-list"
+                        >
+                          {userData &&
+                            value.map((val, index) => {
+                              return (
+                                <Input
+                                  className="YourProfileInput"
+                                  placeholder={`${val}`}
+                                  type="string"
+                                  value={val}
+                                  name="skill"
+                                  onChange={(e) => onChange(e, index)}
+                                  required={false}
+                                  maxLength={12}
+                                  labelClassName={'YourProfileInputLabel'}
+                                  key={index}
+                                />
+                              )
+                            })}
+                        </div>
+                      </div>
+                    )
                   } else {
                     var label = key
 
@@ -223,10 +306,6 @@ const YourProfile = () => {
                     }
                     if (key === 'lastName') {
                       label = 'Last Name'
-                    }
-
-                    if (key === 'image') {
-                      return
                     }
 
                     return (

@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState } from 'react'
-import axios from 'axios'
 
 import { Row, Col, Form } from 'react-bootstrap'
 

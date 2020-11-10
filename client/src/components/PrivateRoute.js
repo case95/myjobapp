@@ -19,11 +19,12 @@ const PrivateRoute = ({ component, ...options }) => {
   const onError = () => {
     history.push('/login')
   }
-  console.log('user', user)
   useEffect(() => {
     const validateJWT = async () => {
       if (!user) {
         const userResponse = await AuthenticationServices.getAuth({ onError })
+
+        console.log('USERRESPONSE' + userResponse)
         if (userResponse) {
           dispatch({ type: SET_USER, payload: userResponse.id })
         }

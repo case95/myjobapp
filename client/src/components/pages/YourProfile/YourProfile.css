@@ -60,7 +60,7 @@
 
 #imagePreview {
   width: 130px;
-  height: 130px;
+  min-height: 100%;
   object-fit: cover;
   object-position: center;
 }
@@ -109,4 +109,17 @@
   .my-background {
     padding: 0 30px;
   }
+  .YourProfileTab {
+    width: 650px;
+    max-width: none;
+  }
+}
+
+.skillsLabel {
+  display: inline-block;
+  flex: 0 0 100px;
+}
+
+.skillsContainer {
+  float: left;
 }

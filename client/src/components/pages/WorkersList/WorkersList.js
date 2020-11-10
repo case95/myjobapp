@@ -17,8 +17,11 @@ import data from '../../../models/models'
 const WorkersList = () => {
   useEffect(() => {
     const fetchData = async () => {
-      const a = await getCategories()
-      setCategories(a)
+      const fetchedCategories = await getCategories()
+      setCategories([
+        { id: '', category: 'Select category' },
+        ...fetchedCategories,
+      ])
     }
 
     fetchData()
@@ -34,6 +37,8 @@ const WorkersList = () => {
     location: '',
   })
 
+  const [searchResult, setSearchResult] = useState([])
+
   const { category, position, location } = searchPayload
 
   const [error, setError] = useState()
@@ -41,14 +46,15 @@ const WorkersList = () => {
   const onSubmit = async () => {
     try {
       const response = await usersServices.getUsers(searchPayload)
-      console.log(response)
+      setSearchResult(response.data)
+      console.log(response.data)
     } catch (err) {
       setError(err)
     }
   }
 
-  const onChange = async (e) => {
-    await setSearchPayload({
+  const onChange = (e) => {
+    setSearchPayload({
       ...searchPayload,
       [e.target.name]: e.target.value,
     })
@@ -59,9 +65,9 @@ const WorkersList = () => {
       (worker) => worker.category === showCategory
     )
 
-    return filteredList.map((worker) => (
+    return searchResult.map((worker) => (
       <WorkerProfile
-        img={worker.address.city}
+        location={worker.location}
         name={worker.firstName}
         lastName={worker.lastName}
         jobTitle={worker.jobTitle}
@@ -79,6 +85,7 @@ const WorkersList = () => {
       return response.data
     } catch (err) {
       console.log(err)
+      setError('No results were found')
     }
   }
 
@@ -102,10 +109,7 @@ const WorkersList = () => {
                 idNumber={0}
                 required={true}
                 spacer={false}
-                onChange={(e) => {
-                  setCategory(e.target.value)
-                  onChange(e)
-                }}
+                onChange={onChange}
                 select={true}
                 options={
                   Array.isArray(categories) ? (
@@ -148,7 +152,9 @@ const WorkersList = () => {
                   </p>
                 }
               ></Button>
-              {error && <div className="text-danger mb-3">{error}</div>}
+              {/* {error && (
+                <div className="text-danger mb-3">{error.data.err}</div>
+              )} */}
             </Col>
           </Row>
         </Form>
@@ -246,14 +252,26 @@ const WorkersList = () => {
         </div>
 
         <div id=" contactList">
-          {showCategory ? (
-            filterUsers(data.workers)
+          {searchResult.length > 0 ? (
+            searchResult.map((worker) => (
+              <WorkerProfile
+                location={worker.location}
+                name={worker.firstName}
+                lastName={worker.lastName}
+                position={worker.job}
+                img={worker.image}
+                skills={worker.skills}
+                key={worker.id}
+                id={worker.id}
+                bio={worker.bio}
+              ></WorkerProfile>
+            ))
           ) : (
             <Row>
               <h1 className="mx-auto">Search workers :)</h1>
             </Row>
           )}
-          {error && <div className="text-danger mb-3">{error}</div>}
+          {/* {error && <div className="text-danger mb-3">{error}</div>} */}
         </div>
       </div>
     </div>

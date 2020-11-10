@@ -37,7 +37,7 @@ function App() {
             <Route component={NotFound} />
           </Switch>
         </div>
-        <Footer>DevelopersMelbourne</Footer>
+        <Footer>CASE</Footer>
       </Router>
     </div>
   )

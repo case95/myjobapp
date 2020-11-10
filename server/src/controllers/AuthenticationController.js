@@ -20,7 +20,17 @@ module.exports = {
   //register user
   async register(req, res) {
     try {
-      const user = await User.create(req.body) // Creates a new user using the user model
+      const user = await User.create({
+        ...req.body,
+        image: '',
+        location: '',
+        phone: '',
+        website: '',
+        availability: 0,
+        job: '',
+        skills: '1,2,3,4,5',
+        bio: `Hello, I'm ${req.body.firstName}`,
+      }) // Creates a new user using the user model
       const userJSON = user.toJSON() // Converts the user to JSON
       res.send({
         //we don't want to send back the password
@@ -55,13 +65,17 @@ module.exports = {
         })
       }
       //If the login details are correct sends back a token
-      const userJSON = user.toJSON()
+      const userTest = {
+        password: user.password,
+        email: user.email,
+        id: user.id,
+      }
+      const userJSON = userTest
       res.send({
         user: userJSON,
         token: jwtLoginUser(userJSON),
       })
     } catch (err) {
-      console.log(err)
       res.status(500).send({
         error: 'A errors has occurred well trying to login',
       })

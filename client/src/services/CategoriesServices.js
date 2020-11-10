@@ -1,7 +1,7 @@
-import Api from "./Api";
+import Api from './Api'
 
 export default {
   getCategories() {
-    return Api().get(`browse`,)
-  }
-};
+    return Api().get(`categories`)
+  },
+}

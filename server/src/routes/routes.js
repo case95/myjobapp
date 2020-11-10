@@ -27,10 +27,10 @@ router.get(
 
 /* Need to save JWT in HTML only cookie*/
 
-router.get('/browse', CategoriesController.getCategories)
+router.get('/categories', CategoriesController.getCategories)
 
-/*router.get("/browse", UserController.getUsers);*/
-/*router.get("/browse/:userId", UserController.getUsersById);*/
+router.get('/browse', UsersController.getUsers)
+/*router.get('/browse/:userId', UsersController.getUsersById)*/
 
 router.get('/yourprofile/:userId', UsersController.getUserData)
 router.put('/yourprofile/:userId', UsersController.updateUserData)

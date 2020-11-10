@@ -14,10 +14,8 @@ export default {
   async getAuth({ onError }) {
     try {
       const jwt = sessionStorage.get('jwt')
-      console.log('jwt', jwt)
       axios.defaults.headers.common['Authorization'] = jwt
       const authResponse = await Api().get('auth')
-      console.log('authResponse', authResponse)
       const { user } = authResponse.data
       return user
     } catch (err) {
