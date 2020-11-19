@@ -8,8 +8,23 @@
   margin-bottom: 30px;
 }
 
-.imgContainer {
+.imgSectionContainer {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
   position: relative;
+  display: table;
+}
+
+@media (min-width: 576px) {
+  .imgSectionContainer {
+    position: relative;
+    display: block;
+    margin-bottom: 0;
+  }
+}
+
+.imgContainer {
   height: 100px;
   width: 100px;
   overflow: hidden;
@@ -18,10 +33,21 @@
 }
 
 .imgContainer img {
-  height: 100px;
+  width: 100%;
+  min-height: 100px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.AvailabilityDot {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 5px;
+  right: 5px;
+  margin-bottom: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  z-index: 4;
 }
 
 .location {

@@ -33,6 +33,7 @@ module.exports = {
       }) // Creates a new user using the user model
       const userJSON = user.toJSON() // Converts the user to JSON
       res.send({
+        id: userJSON.id,
         //we don't want to send back the password
         user: userJSON.email,
         //by sending back the token on register, the user gets automatically logged in
@@ -87,7 +88,7 @@ module.exports = {
       const token = req.headers.authorization
       if (!token) {
         res.status(500).send({
-          error: 'A errors has occurred while trying to login',
+          error: 'Authentication failed.',
         })
       } else {
         jwt.verify(token, config.authentication.jwtSecret, (err, user) => {
@@ -122,44 +123,3 @@ module.exports = {
     }
   },
 }
-
-/*
-import axios from 'axios';
-const setAuthToken = token => {
-  if(token) {
-    axios.defaults.headers.common['x-auth-token'] = token;
-  } else {
-    delete axios.defaults.headers.common['x-auth-token'];
-  }
-};
-export default setAuthToken;
-*/
-
-/*
-// File: middleware/auth
-// Middleware to verify web tokens
-function auth(req, res, next){
-  // We sent the user token in the http header in the property 'x-auth-token'
-  // To keeps things consistent let get the client app to send the token in the http header using the same property name
-  const token = req.header('x-auth-token');
-  if(!token){
-    //If no token in header property x-auth-token
-    return res.status(401).send('Access Denied! No token provided');
-  }
-  try{
-    //Decode the token
-    const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-    //store the decoded token in the req for the next bit of middleware to access
-    req.user = decoded;
-    //Call next() middle ware
-    next();
-  }
-  catch(ex){
-    //jwt.verify() throw a exception if the token is not valid
-    res.status(400).send('Invalid token.');
-  }
-}
-// Export middleware
-module.exports = auth;
-
-*/

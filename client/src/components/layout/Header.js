@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
@@ -12,18 +12,38 @@ import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { SET_USER } from '../../store/actions'
 
+import AuthenticationServices from '../../services/AuthenticationServices'
+
 import './Header.css'
 
 const Header = ({ children, logo }) => {
-  const isSignedIn = !!useSelector((state) => state.user)
   const history = useHistory()
+
+  const user = !!useSelector((state) => state.user)
   const dispatch = useDispatch()
+
+  const onError = () => {
+    return
+  }
 
   const logout = () => {
     sessionStorage.clear()
     dispatch({ type: SET_USER, payload: null })
     history.push('/')
   }
+
+  useEffect(() => {
+    const validateJWT = async () => {
+      if (!user) {
+        const userResponse = await AuthenticationServices.getAuth({ onError })
+
+        if (userResponse) {
+          dispatch({ type: SET_USER, payload: userResponse.id })
+        }
+      }
+    }
+    validateJWT()
+  }, [user, AuthenticationServices])
 
   return (
     <Navbar bg="dark" variant="dark" expand="md" className="m-0 py-3">
@@ -46,7 +66,7 @@ const Header = ({ children, logo }) => {
             </Link>
           </li>
 
-          {!isSignedIn && (
+          {!user && (
             <li className="nav-item">
               <Link to="/register" className="nav-link">
                 Register
@@ -54,7 +74,7 @@ const Header = ({ children, logo }) => {
             </li>
           )}
 
-          {!isSignedIn && (
+          {!user && (
             <li className="nav-item">
               <Link to="/login" className="nav-link">
                 Log In
@@ -62,7 +82,7 @@ const Header = ({ children, logo }) => {
             </li>
           )}
 
-          {isSignedIn && (
+          {user && (
             <li className="nav-item">
               <Link to="/yourprofile" className="nav-link">
                 Your Profile
@@ -70,7 +90,7 @@ const Header = ({ children, logo }) => {
             </li>
           )}
 
-          {isSignedIn && (
+          {user && (
             <li className="nav-item">
               <Link to="/" className="nav-link" onClick={() => logout()}>
                 Log Out

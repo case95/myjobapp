@@ -8,8 +8,11 @@ import Button from '../../Button/Button'
 
 import { useHistory } from 'react-router-dom'
 
+import sessionStorage from '../../../store/sessionStorage'
+import { SET_USER } from '../../../store/actions'
+
 //Redux
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 //Services
 import UsersServices from '../../../services/UsersServices'
@@ -18,6 +21,7 @@ import CategoriesServices from '../../../services/CategoriesServices'
 import './YourProfile.css'
 
 const YourProfile = () => {
+  const dispatch = useDispatch()
   const [userData, setUserData] = useState()
 
   const [categories, setCategories] = useState([])
@@ -78,6 +82,12 @@ const YourProfile = () => {
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === ',') {
+      e.preventDefault()
+    }
+  }
+
   const onChange = (e, index) => {
     e.persist()
     if (e.target.name === 'image') {
@@ -101,6 +111,10 @@ const YourProfile = () => {
       return
     }
     if (e.target.name === 'skill') {
+      if (e.target.value.includes(',')) {
+        e.target.value = e.target.value.replace(',', '')
+      }
+
       const newArray = userData.skills
       newArray[index] = e.target.value
 
@@ -134,6 +148,19 @@ const YourProfile = () => {
       setError(
         'There was a problem updating your informations. Your image might be too heavy.'
       )
+    }
+  }
+
+  const onDelete = async () => {
+    console.log(userData.id)
+    try {
+      await UsersServices.deleteUser(userData.id)
+      sessionStorage.remove('jwt')
+      dispatch({ type: SET_USER, payload: null })
+      redirect.push('/')
+    } catch (err) {
+      console.log(err)
+      setError('There was a problem deleting your profile.')
     }
   }
 
@@ -282,12 +309,16 @@ const YourProfile = () => {
                             value.map((val, index) => {
                               return (
                                 <Input
+                                  id={`skill-${index + 1}`}
                                   className="YourProfileInput"
                                   placeholder={`${val}`}
                                   type="string"
                                   value={val}
                                   name="skill"
-                                  onChange={(e) => onChange(e, index)}
+                                  onChange={
+                                    ((e) => handleKeyDown(e),
+                                    (e) => onChange(e, index))
+                                  }
                                   required={false}
                                   maxLength={12}
                                   labelClassName={'YourProfileInputLabel'}
@@ -327,14 +358,14 @@ const YourProfile = () => {
                   }
                 })}
               {error && <div className="text-danger mb-3">{error}</div>}
+              <Button type="submit">Submit</Button>
               <Button
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  onSubmit(e)
+                type="button"
+                onClick={() => {
+                  onDelete()
                 }}
-              >
-                Submit
-              </Button>
+                child={'Delete Profile'}
+              ></Button>
             </Form>
           </div>
         }

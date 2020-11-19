@@ -8,12 +8,15 @@ export default {
     return Api().get(`/browse`, {
       params: {
         category: search.category,
+        job: search.job,
         location: search.location,
-        position: search.position,
       },
     })
   },
   updateUserData(userData) {
     return Api().put(`/yourprofile/${userData.id}`, userData)
+  },
+  deleteUser(id) {
+    return Api().delete(`/yourprofile/${id}`)
   },
 }

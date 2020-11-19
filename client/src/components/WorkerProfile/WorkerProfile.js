@@ -9,11 +9,14 @@ const WorkerProfile = ({
   location,
   name,
   lastName,
-  position,
+  job,
   img,
   skills,
   id,
   bio,
+  availability,
+  phone,
+  website,
 }) => {
   return (
     <Container
@@ -23,9 +26,18 @@ const WorkerProfile = ({
         <div>
           <div className=" profileRow row m-0">
             <div className="col col-md-10 p-0 d-sm-flex flex-row">
-              <div className="imgContainer mx-auto mx-sm-0">
-                <img src={img} alt={`${name} ${lastName}'s profile`} />
+              <div className="imgSectionContainer mx-auto mx-sm-0">
+                <div className="imgContainer">
+                  <img src={img} alt={`${name} ${lastName}'s profile`} />
+                </div>
+
+                <label
+                  className={`AvailabilityDot ${
+                    availability ? `bg-success` : `bg-danger`
+                  }`}
+                ></label>
               </div>
+
               <div className="workerInfo text-center text-sm-left ml-sm-3">
                 <p className="location mb-0 mx-auto mx-sm-0 text-uppercase">
                   {location}
@@ -34,7 +46,7 @@ const WorkerProfile = ({
                 <p className="fullName mb-0 mx-auto mx-sm-0 h5 text-capitalize">
                   {name} {lastName}
                 </p>
-                <p className="jobTitle mb-0 mx-auto mx-sm-0 h6">{position}</p>
+                <p className="jobTitle mb-0 mx-auto mx-sm-0 h6">{job}</p>
 
                 <div className="d-md-flex mt-1 flex-row">
                   {skills.split(',').map((skill, index) => (
@@ -73,8 +85,18 @@ const WorkerProfile = ({
             </div>
           </div>
 
-          <div className="collapse pb-3 pr-3 pl-3" id={`ex${id}`}>
+          <div className="collapse " id={`ex${id}`}>
             <div className="pt-3">{bio}</div>
+            {phone ? (
+              <p className="m-0">
+                Phone: <a href={`tel:${phone}`}>{phone}</a>
+              </p>
+            ) : null}
+            {website ? (
+              <p className="m-0">
+                Website: <a href={`${website}`}>{website}</a>
+              </p>
+            ) : null}
           </div>
         </div>
       }

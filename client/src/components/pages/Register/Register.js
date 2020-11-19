@@ -1,24 +1,36 @@
-import React from "react";
-import { useState } from "react";
-import { Row, Col, Form } from "react-bootstrap";
+import React from 'react'
+import { useState } from 'react'
+import { Row, Col, Form } from 'react-bootstrap'
 
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link } from 'react-router-dom'
 
-import Input from "../../Input/Input";
-import Button from "../../Button/Button";
-import Container from "../../Container/Container";
+import Input from '../../Input/Input'
+import Button from '../../Button/Button'
+import Container from '../../Container/Container'
 
-import AuthenticationServices from "../../../services/AuthenticationServices";
+import AuthenticationServices from '../../../services/AuthenticationServices'
 
-import "./Register.css";
+import { useDispatch } from 'react-redux'
+//Importing our actions.
+//This helps us organizing our redux store and avoids making typos.
+import { SET_TOKEN, SET_USER } from '../../../store/actions'
+
+//Util to save on session storage
+import sessionStorage from '../../../store/sessionStorage'
+
+import './Register.css'
 
 const Register = () => {
-  const [userData, setUserData] = useState({firstName:'',
-    lastName:'',
-    email:'',
-    password:'',
-    repeatPassword:'',
-    error:'',});
+  const dispatch = useDispatch()
+
+  const [userData, setUserData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    repeatPassword: '',
+    error: '',
+  })
 
   const {
     firstName,
@@ -27,45 +39,53 @@ const Register = () => {
     password,
     repeatPassword,
     error,
-  } = userData;
+  } = userData
 
-  const history = useHistory();
+  const history = useHistory()
 
   const redirect = () => {
-    history.push("/");
-  };
+    history.push('/')
+  }
 
   const onChange = (e) => {
     setUserData({
       ...userData,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   const onSubmit = async () => {
     try {
       if (password === repeatPassword) {
-        await AuthenticationServices.register({
+        const response = await AuthenticationServices.register({
           firstName: firstName,
           lastName: lastName,
           email: email,
           password: password,
-        });
-        redirect();
+        })
+
+        const { id, token } = response.data
+
+        sessionStorage.set('jwt', token)
+
+        dispatch({ type: SET_USER, payload: id })
+        dispatch({ type: SET_TOKEN, payload: token })
+
+        redirect()
       } else {
         setUserData({
           ...userData,
           error: "Passwords don't match",
-        });
+        })
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
       setUserData({
         ...userData,
         error: err.response.data.error,
-      });
+      })
     }
-  };
+  }
 
   return (
     <div className="signInContainer d-flex">
@@ -84,8 +104,8 @@ const Register = () => {
         child={
           <Form
             onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(e);
+              e.preventDefault()
+              onSubmit(e)
             }}
           >
             <Row className="m-0">
@@ -157,11 +177,11 @@ const Register = () => {
 
             <div>
               <p className="disclaimer">
-                By clicking Join, you agree to the website{" "}
+                By clicking Join, you agree to the website{' '}
                 <Link to="/notfound" className="link disclaimerLink">
                   Privacy Policy
                 </Link>
-                , and{" "}
+                , and{' '}
                 <Link to="/notfound" className=" link disclaimerLink">
                   Cookie Policy
                 </Link>
@@ -169,12 +189,12 @@ const Register = () => {
               </p>
             </div>
 
-            <Button type={"submit"}>Join</Button>
+            <Button type={'submit'}>Join</Button>
           </Form>
         }
       ></Container>
     </div>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

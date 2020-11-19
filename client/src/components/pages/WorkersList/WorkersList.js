@@ -11,17 +11,21 @@ import CategoriesServices from '../../../services/CategoriesServices'
 
 import './WorkersList.css'
 
-//CHANGE THIS WITH THE RESULT OF THE GET REQUEST
-import data from '../../../models/models'
+const WorkersList = (state) => {
+  const [searchResult, setSearchResult] = useState([])
 
-const WorkersList = () => {
   useEffect(() => {
     const fetchData = async () => {
       const fetchedCategories = await getCategories()
       setCategories([
-        { id: '', category: 'Select category' },
+        { id: '', category: 'All Categories' },
         ...fetchedCategories,
       ])
+      if (state.history.location.usersList) {
+        const a = state.history.location.usersList
+        console.log(a)
+        setSearchResult([...a])
+      }
     }
 
     fetchData()
@@ -33,23 +37,28 @@ const WorkersList = () => {
 
   const [searchPayload, setSearchPayload] = useState({
     category: '',
-    position: '',
+    job: '',
     location: '',
   })
 
-  const [searchResult, setSearchResult] = useState([])
-
-  const { category, position, location } = searchPayload
+  const { category, job, location } = searchPayload
 
   const [error, setError] = useState()
 
   const onSubmit = async () => {
     try {
       const response = await usersServices.getUsers(searchPayload)
-      setSearchResult(response.data)
       console.log(response.data)
+      if (!response.data.error) {
+        setError()
+        setSearchResult(response.data)
+      } else {
+        setCategory()
+        setSearchResult()
+        setError(response.data.error)
+      }
     } catch (err) {
-      setError(err)
+      setError(err.response.data.error)
     }
   }
 
@@ -58,25 +67,7 @@ const WorkersList = () => {
       ...searchPayload,
       [e.target.name]: e.target.value,
     })
-  }
-
-  const filterUsers = (list) => {
-    const filteredList = list.filter(
-      (worker) => worker.category === showCategory
-    )
-
-    return searchResult.map((worker) => (
-      <WorkerProfile
-        location={worker.location}
-        name={worker.firstName}
-        lastName={worker.lastName}
-        jobTitle={worker.jobTitle}
-        img={worker.image.img}
-        alt={worker.image.alt}
-        skills={worker.skills}
-        key={worker.id}
-      ></WorkerProfile>
-    ))
+    console.log(searchPayload)
   }
 
   const getCategories = async () => {
@@ -107,16 +98,23 @@ const WorkersList = () => {
                 value={category}
                 name="category"
                 idNumber={0}
-                required={true}
                 spacer={false}
                 onChange={onChange}
                 select={true}
                 options={
                   Array.isArray(categories) ? (
                     categories.map((category) => {
-                      return (
-                        <option key={category.id}>{category.category}</option>
-                      )
+                      if (category.category === 'All Categories') {
+                        return (
+                          <option key={category.id} value={2}>
+                            {category.category}
+                          </option>
+                        )
+                      } else {
+                        return (
+                          <option key={category.id}>{category.category}</option>
+                        )
+                      }
                     })
                   ) : (
                     <option key={category.id}>Loading</option>
@@ -125,10 +123,10 @@ const WorkersList = () => {
               ></Input>
               <Input
                 className="mb-3"
-                placeholder="Position"
+                placeholder="Job"
                 type="string"
-                value={position}
-                name="position"
+                value={job}
+                name="job"
                 idNumber={0}
                 spacer={false}
                 onChange={(e) => onChange(e)}
@@ -152,9 +150,6 @@ const WorkersList = () => {
                   </p>
                 }
               ></Button>
-              {/* {error && (
-                <div className="text-danger mb-3">{error.data.err}</div>
-              )} */}
             </Col>
           </Row>
         </Form>
@@ -175,7 +170,6 @@ const WorkersList = () => {
                 value={category}
                 name="category"
                 idNumber={0}
-                required={true}
                 spacer={false}
                 onChange={(e) => {
                   setCategory(e.target.value)
@@ -186,9 +180,17 @@ const WorkersList = () => {
                 options={
                   Array.isArray(categories) ? (
                     categories.map((category) => {
-                      return (
-                        <option key={category.id}>{category.category}</option>
-                      )
+                      if (category.category === 'All Categories') {
+                        return (
+                          <option key={category.id} value={''}>
+                            {category.category}
+                          </option>
+                        )
+                      } else {
+                        return (
+                          <option key={category.id}>{category.category}</option>
+                        )
+                      }
                     })
                   ) : (
                     <option key={category.id}>Loading</option>
@@ -199,12 +201,11 @@ const WorkersList = () => {
 
             <Col>
               <Input
-                placeholder="Position"
+                placeholder="Job"
                 type="string"
-                value={position}
-                name="position"
+                value={job}
+                name="job"
                 idNumber={0}
-                required={true}
                 spacer={false}
                 onChange={(e) => onChange(e)}
                 prepend={true}
@@ -219,7 +220,6 @@ const WorkersList = () => {
                 value={location}
                 name="location"
                 idNumber={0}
-                required={true}
                 spacer={false}
                 onChange={(e) => onChange(e)}
                 prepend={true}
@@ -252,26 +252,32 @@ const WorkersList = () => {
         </div>
 
         <div id=" contactList">
-          {searchResult.length > 0 ? (
+          {Array.isArray(searchResult) && searchResult.length > 0 ? (
             searchResult.map((worker) => (
               <WorkerProfile
                 location={worker.location}
                 name={worker.firstName}
                 lastName={worker.lastName}
-                position={worker.job}
+                job={worker.job}
                 img={worker.image}
                 skills={worker.skills}
                 key={worker.id}
                 id={worker.id}
                 bio={worker.bio}
+                availability={worker.availability}
+                phone={worker.phone}
+                website={worker.website}
               ></WorkerProfile>
             ))
           ) : (
             <Row>
-              <h1 className="mx-auto">Search workers :)</h1>
+              {error ? (
+                <div className="h3 text-danger mb-3 mx-auto">{error}</div>
+              ) : (
+                <div className="h2 mx-auto">Search workers :)</div>
+              )}
             </Row>
           )}
-          {/* {error && <div className="text-danger mb-3">{error}</div>} */}
         </div>
       </div>
     </div>
@@ -279,124 +285,3 @@ const WorkersList = () => {
 }
 
 export default WorkersList
-
-/*
-
-<Nav variant="tabs" >
-              {Array.isArray(categories) ? categories.map((category, index) => (
-                <Nav.Item key={index}>
-                  <Nav.Link
-                    eventKey={`link-${index}`}
-                    onClick={() => setCategory(category.category)}
-                  >
-                    {category.category}
-                  </Nav.Link>
-                </Nav.Item>
-                )) :
-                <h1>'...is Loading'</h1>
-              }
-            </Nav>
-
-
-
-
-export class WorkersList extends Component {
-  state = {
-    category: data.categories[0],
-  };
-
-  filterUsers = (list) => {
-    const filteredList = list.filter(
-      (worker) => worker.category === this.state.category
-    );
-
-    return filteredList.map((worker) => (
-      <WorkerProfile
-        location={worker.address.city}
-        name={worker.firstName}
-        lastName={worker.lastName}
-        jobTitle={worker.jobTitle}
-        img={worker.image.img}
-        alt={worker.image.alt}
-        skills={worker.skills}
-      ></WorkerProfile>
-    ));
-  };
-
-  render() {
-    return (
-      <div className='my-background'>
-        
-        <Row>
-          <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit(e);
-              }}
-            >
-              <Input
-                placeholder="Browse"
-                type="string"
-                value={value}
-                name="Browse"
-                idNumber={0}
-                required={true}
-                spacer={false}
-                onChange={(e) => onChange(e)}
-                prepend={true}
-                child={
-                  <div>
-                    <InputGroup.Append>
-                      <Button
-                        type={"submit"}
-                        append={true}
-                        style={{ height: "100%" }}
-                        child={
-                          <i className="fa fa-search" aria-hidden="true"></i>
-                        }
-                      ></Button>
-                    </InputGroup.Append>
-                    {error && <div className="text-danger mb-3">{error}</div>}
-                  </div>
-                }
-              ></Input>
-            </Form>
-          </Row>
-        
-        
-          <Nav variant="tabs" defaultActiveKey="link-0">
-            {data.categories.map((category, index) => (
-              <Nav.Item key={{ index }}>
-                <Nav.Link
-                  eventKey={`link-${index}`}
-                  onClick={() => this.setState({ category: category })}
-                >
-                  {category}
-                </Nav.Link>
-              </Nav.Item>
-            ))}
-          </Nav>
-          
-          
-          
-          
-          
-          
-          <div
-            className="container-fluid p-3"
-            style={{ backgroundColor: "#fff", width: "100%" }}
-          >
-            <div className="row">
-              <div className="col">
-                <p className="h2 text-primary">{this.state.category}</p>
-              </div>
-            </div>
-
-            <div id=" contactList">{this.filterUsers(data.workers)}</div>
-          </div>
-      </div>
-    );
-  }
-}
-
-export default WorkersList; */

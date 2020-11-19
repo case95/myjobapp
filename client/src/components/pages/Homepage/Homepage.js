@@ -1,38 +1,53 @@
-import React from "react";
-import { useState } from "react";
+import React from 'react'
+import { useState } from 'react'
 
-import { Link } from "react-router-dom";
+import { Link, useHistory } from 'react-router-dom'
 
-import { Form, InputGroup } from "react-bootstrap";
+import { useSelector } from 'react-redux'
 
-import Container from "../../Container/Container";
-import Button from "../../Button/Button";
-import Input from "../../Input/Input";
+import { Form, InputGroup } from 'react-bootstrap'
 
-import "./Homepage.css";
+import usersServices from '../../../services/UsersServices'
+
+import Container from '../../Container/Container'
+import Button from '../../Button/Button'
+import Input from '../../Input/Input'
+
+import './Homepage.css'
 
 const Homepage = () => {
-  const [Browse, setBrowse] = useState({});
+  const redirect = useHistory()
 
-  const { value, error } = Browse;
+  const [browse, setBrowse] = useState({ category: '', job: '', location: '' })
+
+  const [error, setError] = useState('')
+
+  const user = useSelector((state) => state.user)
 
   const onChange = (e) => {
     setBrowse({
-      ...Browse,
-      value: e.target.value,
-    });
-  };
+      ...browse,
+      job: e.target.value,
+    })
+    console.log(browse)
+  }
 
   const onSubmit = async () => {
     try {
+      const response = await usersServices.getUsers(browse)
+      if (!response.data.error) {
+        setError()
+        redirect.push({
+          pathname: '/browse',
+          usersList: response.data,
+        })
+      } else {
+        setError(response.data.error)
+      }
     } catch (err) {
-      console.log(err);
-      setBrowse({
-        ...Browse,
-        error: "No matching results were found.",
-      });
+      console.log(err)
     }
-  };
+  }
 
   return (
     <div className="heroImage d-flex">
@@ -60,14 +75,14 @@ const Homepage = () => {
         child={
           <Form
             onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(e);
+              e.preventDefault()
+              onSubmit(e)
             }}
           >
             <Input
               placeholder="Browse"
               type="string"
-              value={value}
+              value={browse.job}
               name="Browse"
               idNumber={0}
               required={true}
@@ -78,23 +93,23 @@ const Homepage = () => {
                 <div>
                   <InputGroup.Append>
                     <Button
-                      type={"submit"}
+                      type={'submit'}
                       append={true}
-                      style={{ height: "100%" }}
+                      style={{ height: '100%' }}
                       child={
                         <i className="fa fa-search" aria-hidden="true"></i>
                       }
                     ></Button>
                   </InputGroup.Append>
-                  {error && <div className="text-danger mb-3">{error}</div>}
                 </div>
               }
-            ></Input>
+            />
+            {error && <div className="text-danger mb-3">{error}</div>}
           </Form>
         }
       ></Container>
     </div>
-  );
-};
+  )
+}
 
-export default Homepage;
+export default Homepage

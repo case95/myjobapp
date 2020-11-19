@@ -30,9 +30,13 @@ router.get(
 router.get('/categories', CategoriesController.getCategories)
 
 router.get('/browse', UsersController.getUsers)
-/*router.get('/browse/:userId', UsersController.getUsersById)*/
 
 router.get('/yourprofile/:userId', UsersController.getUserData)
-router.put('/yourprofile/:userId', UsersController.updateUserData)
+router.put(
+  '/yourprofile/:userId',
+  AuthenticationController.authCheck,
+  UsersController.updateUserData
+)
+router.delete('/yourprofile/:userId', UsersController.deleteUser)
 
 module.exports = router

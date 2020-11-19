@@ -71,7 +71,6 @@ const LogIn = () => {
   return (
     <div className="logInContainer d-flex">
       <Container
-        /*className="noPositionAbsolute"*/
         styleNumber={0}
         title={`Login to manage your profile.`}
         divider={true}
