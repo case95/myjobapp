@@ -39,26 +39,28 @@ const YourProfile = () => {
     fetchCategories()
 
     const fetchData = async () => {
-      const a = await getUserData(userId)
-      const cleanUserData = Object.entries(a).reduce(
-        (accumulator, [key, value]) => {
-          if (key === 'skills') {
+      const fetchedData = await getUserData(userId)
+      if (typeof fetchedData === 'object' && fetchedData !== null) {
+        const cleanUserData = Object.entries(fetchedData).reduce(
+          (accumulator, [key, value]) => {
+            if (key === 'skills') {
+              return {
+                ...accumulator,
+                [key]:
+                  value === null || value === undefined || ''
+                    ? ['', '', '', '', '']
+                    : value.split(','),
+              }
+            }
             return {
               ...accumulator,
-              [key]:
-                value === null || value === undefined || ''
-                  ? ['', '', '', '', '']
-                  : value.split(','),
+              [key]: value === null || value === undefined ? '' : value,
             }
-          }
-          return {
-            ...accumulator,
-            [key]: value === null || value === undefined ? '' : value,
-          }
-        },
-        {}
-      )
-      setUserData(cleanUserData)
+          },
+          {}
+        )
+        setUserData(cleanUserData)
+      }
     }
     fetchData()
   }, [])

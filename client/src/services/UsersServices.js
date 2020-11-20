@@ -1,9 +1,8 @@
 import Api from './Api'
+import sessionStorage from '../store/sessionStorage'
+import axios from 'axios'
 
 export default {
-  getUserData(userId) {
-    return Api().get(`/yourprofile/${userId}`)
-  },
   getUsers(search) {
     return Api().get(`/browse`, {
       params: {
@@ -13,10 +12,19 @@ export default {
       },
     })
   },
+  getUserData(userId) {
+    const jwt = sessionStorage.get('jwt')
+    axios.defaults.headers.common['Authorization'] = jwt
+    return Api().get(`/yourprofile/${userId}`)
+  },
   updateUserData(userData) {
+    const jwt = sessionStorage.get('jwt')
+    axios.defaults.headers.common['Authorization'] = jwt
     return Api().put(`/yourprofile/${userData.id}`, userData)
   },
   deleteUser(id) {
+    const jwt = sessionStorage.get('jwt')
+    axios.defaults.headers.common['Authorization'] = jwt
     return Api().delete(`/yourprofile/${id}`)
   },
 }
